@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TO-DO LIST WEB APP</title>
+  <style>
+       body {
+        font-family: Arial, sans-serif;
+        background-color: cornflowerblue;
+      background-repeat: no-repeat;
+       
+        margin: 0;
+        padding: 0;
+      }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 5px;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    button {
+      display: block;
+      margin: 10px auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-DO LISTS</h1>
+    <input type="text" id="taskInput" placeholder="Add new task" required>
+    <span class="error-message" id="taskError"></span>
+    <input type="text" id="descriptionInput" placeholder="Add task description" required>
+    <span class="error-message" id="descriptionError"></span>
+    <button id="addButton">Add</button>
+    <h2>PENDING TASKS</h2>
+    <table id="pendingTable">
+      <thead>
+        <tr>
+          <th><b>Task</b></th>
+          <th><b>Description</b></th>
+          <th><b>Action</b></th>
+        </tr>
+      </thead>
+      <tbody id="pendingList"></tbody>
+    </table>
+    <h2>COMPLETED TASK</h2>
+    <table id="completedTable">
+      <thead>
+        <tr>
+          <th><b>Task</b></th>
+          <th><b>Description</b></th>
+          <th><b>Action</b></th>
+        </tr>
+      </thead>
+      <tbody id="completedList"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Get references to HTML elements
+    const taskInput = document.getElementById('taskInput');
+    const descriptionInput = document.getElementById('descriptionInput');
+    const addButton = document.getElementById('addButton');
+    const pendingList = document.getElementById('pendingList');
+    const completedList = document.getElementById('completedList');
+    const taskError = document.getElementById('taskError');
+    const descriptionError = document.getElementById('descriptionError');
+
+    // Add event listener to the Add button
+    addButton.addEventListener('click', addTask);
+
+    // Add event listener to the Enter key
+    taskInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        addTask();
+      }
+    });
+
+    // Add a new task to the pending list
+    function addTask() {
+      const taskText = taskInput.value;
+      const descriptionText = descriptionInput.value;
+      if (taskText.trim() !== '' && descriptionText.trim() !== '') {
+        taskError.textContent = '';
+        descriptionError.textContent = '';
+        const task = createTaskElement(taskText, descriptionText);
+        pendingList.appendChild(task);
+        taskInput.value = '';
+        descriptionInput.value = '';
+      } else {
+        if (taskText.trim() === '') {
+          taskError.textContent = 'Please fill out this field.';
+        } else {
+          taskError.textContent = '';
+        }
+        if (descriptionText.trim() === '') {
+          descriptionError.textContent = 'Please fill out this field.';
+        } else {
+          descriptionError.textContent = '';
+        }
+      }
+    }
+
+    // Create a new task element with the given text and description
+    function createTaskElement(taskText, descriptionText) {
+      const task = document.createElement('tr');
+      const taskNameCell = document.createElement('td');
+      const taskDescriptionCell = document.createElement('td');
+      const taskActionCell = document.createElement('td');
+      const taskLabel = document.createElement('label');
+      const taskCheckbox = document.createElement('input');
+      const taskDeleteButton = document.createElement('button');
+
+      taskCheckbox.type = 'checkbox';
+      taskCheckbox.addEventListener('change', toggleTaskStatus);
+
+      taskDeleteButton.textContent = 'Delete';
+      taskDeleteButton.addEventListener('click', deleteTask);
+
+      taskLabel.textContent = taskText;
+      taskLabel.prepend(taskCheckbox);
+
+      taskNameCell.appendChild(taskLabel);
+      taskDescriptionCell.textContent = descriptionText;
+      taskActionCell.appendChild(taskDeleteButton);
+
+      task.appendChild(taskNameCell);
+      task.appendChild(taskDescriptionCell);
+      task.appendChild(taskActionCell);
+
+      return task;
+    }
+
+    // Toggle the status of a task (pending/completed)
+    function toggleTaskStatus(event) {  
+      const task = event.target.closest('tr');
+      if (task.classList.contains('completed')) {
+        pendingList.appendChild(task);
+        task.classList.remove('completed');
+      } else {
+        completedList.appendChild(task);
+        task.classList.add('completed');
+      }
+    }
+
+    // Delete a task from the list
+    function deleteTask(event) {
+      const task = event.target.closest('tr');
+      task.parentNode.removeChild(task);
+    }
+  </script>
+</body>
+</html>
